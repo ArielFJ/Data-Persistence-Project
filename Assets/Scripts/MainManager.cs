@@ -1,31 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+    [Header("References")]
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    [Header("UI")]
+    public Text userText;
     public Text ScoreText;
     public GameObject GameOverText;
-    
-    private bool m_Started = false;
-    private int m_Points;
-    
-    private bool m_GameOver = false;
 
-    
+    [Header("Effects")]
+    public ParticleSystem[] ParticleSystems;
+
+    private bool m_Started;
+    private int m_Points;
+    private bool _reachHighScore;
+
+    private bool m_GameOver;
+
     // Start is called before the first frame update
     void Start()
     {
+        SetHighScoreText(GameManager.Instance.CurrentUser.Name, GameManager.Instance.CurrentUser.HighScore);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -66,11 +71,36 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        if (m_Points > GameManager.Instance.CurrentUser.HighScore)
+        {
+            GameManager.Instance.CurrentUser.HighScore = m_Points;
+            SetHighScoreText(GameManager.Instance.CurrentUser.Name, m_Points);
+
+            if (!_reachHighScore)
+            {
+                foreach (var particle in ParticleSystems)
+                {
+                    particle.Play();
+                }
+
+                _reachHighScore = true;
+            }
+        }
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void GoBackToMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void SetHighScoreText(string userName, int points)
+    {
+        userText.text = $"Best Score : {userName} : {points}";
     }
 }

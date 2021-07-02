@@ -6,10 +6,15 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     private Rigidbody m_Rigidbody;
+    [SerializeField] private bool _shouldMoveImmediately;
 
     void Start()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        if (_shouldMoveImmediately)
+        {
+            m_Rigidbody.velocity = new Vector3(1, -1, 0).normalized;
+        }
     }
     
     private void OnCollisionExit(Collision other)
