@@ -61,11 +61,9 @@ public class GameManager : MonoBehaviour
     public void LoadAttributes()
     {
         string path = Path.Combine(Application.persistentDataPath, SaveFileName);
-        //File.Delete(path);
         if (File.Exists(path))
         {
             var json = File.ReadAllText(path);
-            Debug.Log(json);
             var data = JsonUtility.FromJson<SaveData>(json);
             _allUsers = data.Users;
             CurrentUser = data.LastUser;
